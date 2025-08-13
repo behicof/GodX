@@ -1,0 +1,7 @@
+{
+  "title": "Omni-Arb Metrics",
+  "panels": [
+    {"type": "graph", "title": "Fill Rate", "targets": [{"expr": "omni_arb_fill_rate"}]},
+    {"type": "graph", "title": "Leg Latency", "targets": [{"expr": "omni_arb_leg_latency_ms_p95"}]}
+  ]
+}
