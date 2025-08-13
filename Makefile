@@ -1,6 +1,8 @@
 # ===== Vars =====
 PY := python3
 PIP := pip
+SBOM := python -m cyclonedx_py
+LICENSES := python -m piplicenses
 DC := docker compose
 
 # detect docker
@@ -8,7 +10,7 @@ HAVE_DOCKER := $(shell command -v docker >/dev/null 2>&1 && echo yes || echo no)
 
 .PHONY: help
 help:
-	@echo "Targets: setup | up | down | logs | logger | orchestrator | backtest | train-ppo | test"
+	@echo "Targets: setup | up | down | logs | logger | orchestrator | backtest | train-ppo | test | verify-vendor | sbom | license-scan"
 
 # ===== Setup (venv + pip) =====
 .PHONY: setup
@@ -20,7 +22,7 @@ setup: .venv req dockerhint
 
 .PHONY: req
 req:
-	. .venv/bin/activate && $(PIP) install -r requirements.txt || true
+	. .venv/bin/activate && $(PIP) install -r requirements.lock || true
 
 .PHONY: dockerhint
 dockerhint:
@@ -73,3 +75,16 @@ train-ppo:
 .PHONY: test
 test:
 	. .venv/bin/activate && pytest -q
+
+# ===== Supply Chain =====
+.PHONY: verify-vendor
+verify-vendor:
+	. .venv/bin/activate && $(PY) scripts/verify_vendor.py
+
+.PHONY: sbom
+sbom:
+	. .venv/bin/activate && $(SBOM) requirements requirements.lock -o sbom.json
+
+.PHONY: license-scan
+license-scan:
+	. .venv/bin/activate && $(LICENSES) --format=json --output-file licenses.json
