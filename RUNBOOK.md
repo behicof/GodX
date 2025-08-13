@@ -10,4 +10,10 @@
 
 - Ensure environment variables for API keys are set (.env).
 - `docker-compose up -d` will start app, Redis, PostgreSQL, Prometheus and Grafana.
+
+```bash
+curl -s http://localhost:9090/-/healthy
+curl -s http://localhost:3000/login
+```
+
 - Logs are JSON formatted via structlog and can be scraped by Prometheus.
