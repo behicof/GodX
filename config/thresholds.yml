@@ -1,0 +1,12 @@
+funding_arb:
+  min_net_edge_bps: 300
+  max_leg_latency_ms: 800
+  max_slippage_bps: 35
+  min_orderbook_depth_usd: 5000
+basis:
+  min_net_edge_bps: 250
+  max_slippage_bps: 30
+cross_exch:
+  min_net_edge_bps: 400
+  max_leg_latency_ms: 700
+  min_orderbook_depth_usd: 10000
