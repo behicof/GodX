@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pydantic
+redis
+psycopg2-binary
+clickhouse-driver
+prometheus-client
+pytest

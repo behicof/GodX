@@ -2,16 +2,17 @@
 PY := python3
 PIP := pip
 DC := docker compose
-APP := omni-arb
 
-# ===== Default =====
+# detect docker
+HAVE_DOCKER := $(shell command -v docker >/dev/null 2>&1 && echo yes || echo no)
+
 .PHONY: help
 help:
 	@echo "Targets: setup | up | down | logs | logger | orchestrator | backtest | train-ppo | test"
 
-# ===== Setup (py + docker) =====
+# ===== Setup (venv + pip) =====
 .PHONY: setup
-setup: .venv req dockercheck
+setup: .venv req dockerhint
 	@echo "[OK] setup done."
 
 .venv:
@@ -21,24 +22,38 @@ setup: .venv req dockercheck
 req:
 	. .venv/bin/activate && $(PIP) install -r requirements.txt || true
 
-.PHONY: dockercheck
-dockercheck:
-	@command -v docker >/dev/null || (echo "Install Docker first."; exit 1)
+.PHONY: dockerhint
+dockerhint:
+ifeq ($(HAVE_DOCKER),no)
+	@echo "[INFO] Docker not found. 'make up' will be a no-op until you install Docker."
+endif
 
-# ===== Compose =====
+# ===== Compose (safe if no docker) =====
 .PHONY: up
 up:
+ifeq ($(HAVE_DOCKER),yes)
 	$(DC) -f deploy/docker-compose.yml up -d
+else
+	@echo "[SKIP] Docker not installed. Install Docker to run 'make up'."
+endif
 
 .PHONY: down
 down:
+ifeq ($(HAVE_DOCKER),yes)
 	$(DC) -f deploy/docker-compose.yml down -v
+else
+	@echo "[SKIP] Docker not installed."
+endif
 
 .PHONY: logs
 logs:
+ifeq ($(HAVE_DOCKER),yes)
 	$(DC) -f deploy/docker-compose.yml logs -f --tail=200
+else
+	@echo "[SKIP] Docker not installed."
+endif
 
-# ===== App Entrypoints (dummy) =====
+# ===== App Entrypoints =====
 .PHONY: logger
 logger:
 	. .venv/bin/activate && $(PY) apps/ingest/logger.py
@@ -53,7 +68,7 @@ backtest:
 
 .PHONY: train-ppo
 train-ppo:
-	. .venv/bin/activate && $(PY) apps/research/train_ppo.py --symbol BTCUSDT --epochs 10
+	. .venv/bin/activate && $(PY) apps/research/train_ppo.py --symbol BTCUSDT --epochs 2
 
 .PHONY: test
 test:
