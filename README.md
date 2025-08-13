@@ -13,6 +13,14 @@ intake through risk checks, execution and logging.
 - `deploy/` – docker-compose and infra helpers
 - `config/` – configuration files
 - `tests/` – pytest test suite
+## Infrastructure
+
+After bringing up services with `docker-compose up -d` (see `RUNBOOK.md`), you can verify Prometheus and the app are healthy:
+
+```bash
+curl -s http://localhost:9090/-/healthy
+curl -s http://localhost:3000/login
+```
 
 ## Getting Started
 
