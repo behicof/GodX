@@ -1,0 +1,5 @@
+max_notional_per_trade_usd: 2000
+max_symbol_exposure_usd: 10000
+max_exchange_exposure_usd: 25000
+margin_buffer_pct: 0.15
+liquidation_distance_bps: 500
