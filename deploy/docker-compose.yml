@@ -1,5 +1,22 @@
 version: "3.9"
 services:
+  api:
+    build: ..
+    command: uvicorn apps.api.main:app --host 0.0.0.0 --port 8000
+    ports: ["8000:8000"]
+    restart: unless-stopped
+    networks:
+      - omni_net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8000/ >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
   redis:
     image: redis:7
     command: ["redis-server","--appendonly","yes"]

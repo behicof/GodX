@@ -7,7 +7,7 @@ APP := omni-arb
 # ===== Default =====
 .PHONY: help
 help:
-	@echo "Targets: setup | up | down | logs | logger | orchestrator | backtest | train-ppo | test"
+        @echo "Targets: setup | up | down | logs | logger | orchestrator | backtest | train-ppo | api | test"
 
 # ===== Setup (py + docker) =====
 .PHONY: setup
@@ -54,6 +54,10 @@ backtest:
 .PHONY: train-ppo
 train-ppo:
 	. .venv/bin/activate && $(PY) apps/research/train_ppo.py --symbol BTCUSDT --epochs 10
+
+.PHONY: api
+api:        ## run API locally (بدون داکر)
+	. .venv/bin/activate && uvicorn apps.api.main:app --host 0.0.0.0 --port 8000
 
 .PHONY: test
 test:
