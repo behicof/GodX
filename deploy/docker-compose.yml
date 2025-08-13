@@ -4,6 +4,21 @@ services:
     image: redis:7
     command: ["redis-server","--appendonly","yes"]
     ports: ["6379:6379"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - redis_data:/data
+    networks:
+      - omni_net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
   postgres:
     image: postgres:15
     environment:
@@ -11,13 +26,82 @@ services:
       POSTGRES_USER: omni
       POSTGRES_DB: omni
     ports: ["5432:5432"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "omni"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - omni_net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
   clickhouse:
     image: clickhouse/clickhouse-server:24
     ports: ["9000:9000","8123:8123"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ch_data:/var/lib/clickhouse
+    networks:
+      - omni_net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
   prometheus:
     image: prom/prometheus:latest
-    volumes: ["./prometheus:/etc/prometheus"]
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prom_data:/prometheus
     ports: ["9090:9090"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    networks:
+      - omni_net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
   grafana:
     image: grafana/grafana:latest
     ports: ["3000:3000"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - graf_data:/var/lib/grafana
+    networks:
+      - omni_net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
+networks:
+  omni_net: {}
+
+volumes:
+  pg_data:
+  ch_data:
+  redis_data:
+  prom_data:
+  graf_data:
