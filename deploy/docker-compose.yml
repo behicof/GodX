@@ -1,5 +1,14 @@
 version: "3.9"
 services:
+  api:
+    build: ../api
+    ports: ["8080:8080"]
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/metrics"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
   redis:
     image: redis:7
     command: ["redis-server","--appendonly","yes"]
