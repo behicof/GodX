@@ -19,3 +19,14 @@ intake through risk checks, execution and logging.
 ```bash
 make test
 ```
+
+## Infrastructure
+
+Start the supporting services with Docker Compose:
+
+```bash
+cd deploy
+docker-compose up -d
+```
+
+This launches Redis, PostgreSQL, ClickHouse, Prometheus, and Grafana.
