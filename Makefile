@@ -58,3 +58,13 @@ train-ppo:
 .PHONY: test
 test:
 	. .venv/bin/activate && pytest -q
+
+.PHONY: shas vendor vendor-clean
+shas:	# refresh repos.lock (uses scripts/fetch_shas.sh)
+	./scripts/fetch_shas.sh
+
+vendor:	# clone & pin from repos.lock
+	./scripts/clone_and_pin.sh
+
+vendor-clean:
+	rm -rf vendor
