@@ -1,0 +1,11 @@
+groups:
+  - name: data-feed
+    rules:
+      - alert: DataFeedStale
+        expr: time() - omni_data_feed_last_update_timestamp_seconds > 300
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: Data feed stale
+          description: Data feed has not been updated in the last 5 minutes.
