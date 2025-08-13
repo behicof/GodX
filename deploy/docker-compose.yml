@@ -1,23 +1,59 @@
 version: "3.9"
+
 services:
+  api:
+    build: ..
+    container_name: omni_api
+    command: uvicorn apps.api.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    networks:
+      - omni_net
+
   redis:
     image: redis:7
     command: ["redis-server","--appendonly","yes"]
-    ports: ["6379:6379"]
+    ports:
+      - "6379:6379"
+    networks:
+      - omni_net
+
   postgres:
     image: postgres:15
     environment:
       POSTGRES_PASSWORD: omni
       POSTGRES_USER: omni
       POSTGRES_DB: omni
-    ports: ["5432:5432"]
+    ports:
+      - "5432:5432"
+    networks:
+      - omni_net
+
   clickhouse:
     image: clickhouse/clickhouse-server:24
-    ports: ["9000:9000","8123:8123"]
+    ports:
+      - "9000:9000"
+      - "8123:8123"
+    networks:
+      - omni_net
+
   prometheus:
     image: prom/prometheus:latest
-    volumes: ["./prometheus:/etc/prometheus"]
-    ports: ["9090:9090"]
+    container_name: omni_prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - omni_net
+
   grafana:
     image: grafana/grafana:latest
-    ports: ["3000:3000"]
+    container_name: omni_grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - omni_net
+
+networks:
+  omni_net:
