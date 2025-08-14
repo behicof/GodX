@@ -10,8 +10,9 @@ class Pipeline:
         self.executor = Executor(exchange)
 
     def run(self, opportunity: dict):
-        if not self.risk.check(opportunity):
-            return {"status": "rejected"}
+        approved, reason = self.risk.check(opportunity)
+        if not approved:
+            return {"status": "rejected", "reason": reason}
         return self.executor.execute(
             opportunity["symbol"], opportunity["side"], opportunity["qty"], opportunity.get("price")
         )

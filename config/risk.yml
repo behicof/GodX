@@ -1,2 +1,2 @@
-max_position: 10
-max_notional: 100000
+max_pos_usd: 100000
+max_leverage: 5
