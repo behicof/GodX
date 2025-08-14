@@ -1,11 +1,16 @@
 groups:
-  - name: data-feed
-    rules:
-      - alert: DataFeedStale
-        expr: time() - omni_data_feed_last_update_timestamp_seconds > 300
-        for: 5m
-        labels:
-          severity: critical
-        annotations:
-          summary: Data feed stale
-          description: Data feed has not been updated in the last 5 minutes.
+- name: omni.rules
+  rules:
+  - alert: DataFeedStale
+    expr: omni_quotes_lag_ms > 2000
+    for: 2m
+    labels: {severity: critical}
+  - alert: HighLegLatencyP95
+    expr: histogram_quantile(0.95, sum(rate(omni_executor_leg_latency_ms_bucket[5m])) by (le)) > 0.9
+    for: 5m
+    labels: {severity: warning}
+  - alert: ErrorRateHigh
+    expr: increase(omni_error_total[5m]) > 5
+    for: 5m
+    labels: {severity: warning}
+
