@@ -3,6 +3,7 @@ PY := python3
 PIP := pip
 DC := docker compose
 APP := omni-arb
+PGW := localhost:9091
 
 # ===== Default =====
 .PHONY: help
@@ -41,19 +42,19 @@ logs:
 # ===== App Entrypoints (dummy) =====
 .PHONY: logger
 logger:
-	. .venv/bin/activate && $(PY) apps/ingest/logger.py
+        . .venv/bin/activate && PUSHGATEWAY_URL=$(PGW) $(PY) apps/ingest/logger.py
 
 .PHONY: orchestrator
 orchestrator:
-	. .venv/bin/activate && $(PY) apps/executor/orchestrator.py
+        . .venv/bin/activate && PUSHGATEWAY_URL=$(PGW) $(PY) apps/executor/orchestrator.py
 
 .PHONY: backtest
 backtest:
-	. .venv/bin/activate && $(PY) apps/backtester/run_backtest.py
+        . .venv/bin/activate && PUSHGATEWAY_URL=$(PGW) $(PY) apps/backtester/run_backtest.py
 
 .PHONY: train-ppo
 train-ppo:
-	. .venv/bin/activate && $(PY) apps/research/train_ppo.py --symbol BTCUSDT --epochs 10
+        . .venv/bin/activate && PUSHGATEWAY_URL=$(PGW) $(PY) apps/research/train_ppo.py --symbol BTCUSDT --epochs 10
 
 .PHONY: test
 test:
