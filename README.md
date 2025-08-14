@@ -26,4 +26,7 @@ curl -s http://localhost:3000/login
 
 ```bash
 make test
+
+# exercise metrics pipeline
+make metrics-smoke
 ```
