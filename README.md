@@ -27,3 +27,22 @@ curl -s http://localhost:3000/login
 ```bash
 make test
 ```
+
+## Metrics
+
+Prometheus-style metrics are available via helpers in `libs/metrics.py`. Metrics
+can be exported over HTTP or pushed to a Pushgateway.
+
+```python
+from libs.metrics import init_metrics, push_metrics
+
+# Start an HTTP server on port 8000
+init_metrics(port=8000)
+
+# Push collected metrics to a gateway
+push_metrics(job="godx", gateway="localhost:9091")
+```
+
+The executor and risk manager automatically publish latency and error counters
+(`executor_execute_latency_seconds`, `executor_execute_errors_total`,
+`risk_manager_check_latency_seconds`, `risk_manager_check_errors_total`).
