@@ -3,11 +3,14 @@ PY := python3
 PIP := pip
 DC := docker compose
 APP := omni-arb
+export PUSHGW_URL ?= http://localhost:9091
+export METRICS_JOB ?= omni-scripts
+
 
 # ===== Default =====
 .PHONY: help
 help:
-	@echo "Targets: setup | up | down | logs | logger | orchestrator | backtest | train-ppo | test"
+	@echo "Targets: setup | up | down | logs | logger | orchestrator | backtest | metrics-smoke | train-ppo | test"
 
 # ===== Setup (py + docker) =====
 .PHONY: setup
@@ -38,19 +41,32 @@ down:
 logs:
 	$(DC) -f deploy/docker-compose.yml logs -f --tail=200
 
-# ===== App Entrypoints (dummy) =====
-.PHONY: logger
+# ===== Metrics Demo =====
+.PHONY: logger orchestrator backtest metrics-smoke
 logger:
-	. .venv/bin/activate && $(PY) apps/ingest/logger.py
+	$(PY) -m apps.ingest.logger_metrics
 
-.PHONY: orchestrator
 orchestrator:
-	. .venv/bin/activate && $(PY) apps/executor/orchestrator.py
+	$(PY) - <<-'PY'
+	from orchestrator.metrics_hook import time_leg, mark_fill
+	import time, random
+	def mock_leg(): time.sleep(random.uniform(0.05,0.2))
+	time_leg(mock_leg); mark_fill("BTCUSDT",1.0)
+	PY
 
-.PHONY: backtest
 backtest:
-	. .venv/bin/activate && $(PY) apps/backtester/run_backtest.py
+	$(PY) - <<-'PY'
+	from apps.backtester.metrics import run_backtest
+	class BT:
+	  def __iter__(self):
+	    import time
+	    for _ in range(5): time.sleep(0.1); yield None
+	  def pnl(self): return 42.0
+	run_backtest(BT())
+	PY
 
+metrics-smoke: logger orchestrator backtest
+# ===== Other Entrypoints =====
 .PHONY: train-ppo
 train-ppo:
 	. .venv/bin/activate && $(PY) apps/research/train_ppo.py --symbol BTCUSDT --epochs 10
