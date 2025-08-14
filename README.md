@@ -27,3 +27,14 @@ curl -s http://localhost:3000/login
 ```bash
 make test
 ```
+
+## Training Reports
+
+The `research/elegantrl_training/utils/report_pdf.py` helper assembles
+`learning.jsonl` and `summary.json` metrics from an artifacts directory into
+`report.pdf`.
+
+```python
+from research.elegantrl_training.utils.report_pdf import generate_report
+generate_report("/path/to/artifacts")
+```
