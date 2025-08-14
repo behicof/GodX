@@ -1,5 +1,8 @@
 from core.exchange.base import Exchange
-from core.data.logger import logger
+from libs.logging_utils import get_logger
+
+logger = get_logger(__name__)
+
 
 class Executor:
     """Simple trade executor."""
