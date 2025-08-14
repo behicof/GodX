@@ -9,3 +9,21 @@ groups:
         annotations:
           summary: Data feed stale
           description: Data feed has not been updated in the last 5 minutes.
+  - name: omni.rules
+    rules:
+      - alert: DataFeedStale
+        expr: omni_quotes_lag_ms > 2000
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Quotes lagging
+          description: Quotes lag exceed 2000 ms for over 2 minutes.
+      - alert: LegLatencyHigh
+        expr: histogram_quantile(0.95, sum(rate(omni_executor_leg_latency_ms_bucket[5m])) by (le)) > 0.95
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: Executor leg latency high
+          description: 95th percentile leg latency above 0.95 ms for over 5 minutes.
