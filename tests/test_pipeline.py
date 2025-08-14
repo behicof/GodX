@@ -14,6 +14,6 @@ class DummyExchange(Exchange):
 def test_pipeline_executes_order():
     exchange = DummyExchange()
     pipe = Pipeline(exchange)
-    result = pipe.run({"symbol": "BTCUSDT", "side": "BUY", "qty": 1})
+    result = pipe.execute({"symbol": "BTCUSDT", "side": "BUY", "qty": 1})
     assert result["status"] == "filled"
     assert exchange.orders[0][0] == "BTCUSDT"

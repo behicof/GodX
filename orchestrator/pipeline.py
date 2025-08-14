@@ -15,3 +15,7 @@ class Pipeline:
         return self.executor.execute(
             opportunity["symbol"], opportunity["side"], opportunity["qty"], opportunity.get("price")
         )
+
+    # Backwards compatibility for tests expecting an `execute` method
+    def execute(self, opportunity: dict):
+        return self.run(opportunity)
