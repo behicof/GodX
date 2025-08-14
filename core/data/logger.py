@@ -1,12 +1,8 @@
-import logging
-import json
+from libs.logging_utils import get_logger
 
-class JSONFormatter(logging.Formatter):
-    def format(self, record: logging.LogRecord) -> str:
-        return json.dumps({"level": record.levelname, "msg": record.getMessage()})
+logger = get_logger("omni")
 
-handler = logging.StreamHandler()
-handler.setFormatter(JSONFormatter())
-logger = logging.getLogger("omni")
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
+
+def write_event(event: str) -> None:
+    """Write a structured event using the shared logger."""
+    logger.info(event)
