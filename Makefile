@@ -7,7 +7,7 @@ APP := omni-arb
 # ===== Default =====
 .PHONY: help
 help:
-	@echo "Targets: setup | up | down | logs | logger | orchestrator | backtest | train-ppo | test"
+	@echo "Targets: setup | up | down | logs | logger | orchestrator | backtest | metrics-smoke | train-ppo | test"
 
 # ===== Setup (py + docker) =====
 .PHONY: setup
@@ -41,15 +41,18 @@ logs:
 # ===== App Entrypoints (dummy) =====
 .PHONY: logger
 logger:
-	. .venv/bin/activate && $(PY) apps/ingest/logger.py
+	$(PY) -m apps.ingest.logger_metrics
 
 .PHONY: orchestrator
 orchestrator:
-	. .venv/bin/activate && $(PY) apps/executor/orchestrator.py
+	$(PY) -m orchestrator.metrics_hook
 
 .PHONY: backtest
 backtest:
-	. .venv/bin/activate && $(PY) apps/backtester/run_backtest.py
+	$(PY) -m apps.backtester.metrics
+
+.PHONY: metrics-smoke
+metrics-smoke: logger orchestrator backtest
 
 .PHONY: train-ppo
 train-ppo:
@@ -57,4 +60,4 @@ train-ppo:
 
 .PHONY: test
 test:
-	. .venv/bin/activate && pytest -q
+	$(PY) -m pytest -q
