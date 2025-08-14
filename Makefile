@@ -3,6 +3,8 @@ PY := python3
 PIP := pip
 DC := docker compose
 APP := omni-arb
+export PUSHGW_URL ?= http://localhost:9091
+export METRICS_JOB ?= omni-scripts
 
 # ===== Default =====
 .PHONY: help
@@ -39,17 +41,17 @@ logs:
 	$(DC) -f deploy/docker-compose.yml logs -f --tail=200
 
 # ===== App Entrypoints (dummy) =====
-.PHONY: logger
+.PHONY: logger orchestrator backtest metrics-smoke
 logger:
-	. .venv/bin/activate && $(PY) apps/ingest/logger.py
+	$(PY) -m apps.ingest.logger_metrics
 
-.PHONY: orchestrator
 orchestrator:
-	. .venv/bin/activate && $(PY) apps/executor/orchestrator.py
+	$(PY) scripts/orchestrator_metrics_demo.py
 
-.PHONY: backtest
 backtest:
-	. .venv/bin/activate && $(PY) apps/backtester/run_backtest.py
+	$(PY) scripts/backtest_metrics_demo.py
+
+metrics-smoke: logger orchestrator backtest
 
 .PHONY: train-ppo
 train-ppo:

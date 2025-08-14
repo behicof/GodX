@@ -1,23 +1,24 @@
 version: "3.9"
 services:
-  redis:
-    image: redis:7
-    command: ["redis-server","--appendonly","yes"]
-    ports: ["6379:6379"]
-  postgres:
-    image: postgres:15
-    environment:
-      POSTGRES_PASSWORD: omni
-      POSTGRES_USER: omni
-      POSTGRES_DB: omni
-    ports: ["5432:5432"]
-  clickhouse:
-    image: clickhouse/clickhouse-server:24
-    ports: ["9000:9000","8123:8123"]
+  redis: { image: redis:7, command: ["redis-server","--appendonly","yes"], ports: ["6379:6379"] }
+  postgres: { image: postgres:15, environment: {POSTGRES_PASSWORD: omni}, ports: ["5432:5432"] }
+  clickhouse: { image: clickhouse/clickhouse-server:24, ports: ["9000:9000","8123:8123"] }
+
+  pushgateway:
+    image: prom/pushgateway:latest
+    ports: ["9091:9091"]
+    restart: unless-stopped
+
   prometheus:
     image: prom/prometheus:latest
-    volumes: ["./prometheus:/etc/prometheus"]
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
     ports: ["9090:9090"]
+    depends_on: [pushgateway]
+
   grafana:
     image: grafana/grafana:latest
     ports: ["3000:3000"]
