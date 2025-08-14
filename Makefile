@@ -41,11 +41,11 @@ logs:
 # ===== App Entrypoints (dummy) =====
 .PHONY: logger
 logger:
-	. .venv/bin/activate && $(PY) apps/ingest/logger.py
+	PYTHONPATH=. $(PY) apps/ingest/logger.py
 
 .PHONY: orchestrator
 orchestrator:
-	. .venv/bin/activate && $(PY) apps/executor/orchestrator.py
+	PYTHONPATH=. $(PY) apps/executor/orchestrator.py
 
 .PHONY: backtest
 backtest:
