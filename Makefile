@@ -7,7 +7,7 @@ APP := omni-arb
 # ===== Default =====
 .PHONY: help
 help:
-	@echo "Targets: setup | up | down | logs | logger | orchestrator | backtest | train-ppo | test"
+        @echo "Targets: setup | up | down | logs | logger | orchestrator | backtest | train-ppo | test"
 
 # ===== Setup (py + docker) =====
 .PHONY: setup
@@ -58,3 +58,8 @@ train-ppo:
 .PHONY: test
 test:
 	. .venv/bin/activate && pytest -q
+
+# ===== Developer Utilities =====
+.PHONY: metrics-smoke
+metrics-smoke:
+	. .venv/bin/activate && $(PY) scripts/metrics_smoke.py
