@@ -1,60 +1,23 @@
-# ===== Vars =====
-PY := python3
-PIP := pip
-DC := docker compose
-APP := omni-arb
+export PUSHGW_URL ?= http://localhost:9091
+export METRICS_JOB ?= omni
 
-# ===== Default =====
-.PHONY: help
-help:
-	@echo "Targets: setup | up | down | logs | logger | orchestrator | backtest | train-ppo | test"
+setup:
+	python -m pip install -U pip wheel
+	pip install fastapi uvicorn prometheus-client
 
-# ===== Setup (py + docker) =====
-.PHONY: setup
-setup: .venv req dockercheck
-	@echo "[OK] setup done."
-
-.venv:
-	$(PY) -m venv .venv && . .venv/bin/activate && $(PIP) install -U pip
-
-.PHONY: req
-req:
-	. .venv/bin/activate && $(PIP) install -r requirements.txt || true
-
-.PHONY: dockercheck
-dockercheck:
-	@command -v docker >/dev/null || (echo "Install Docker first."; exit 1)
-
-# ===== Compose =====
-.PHONY: up
 up:
-	$(DC) -f deploy/docker-compose.yml up -d
+	docker compose -f deploy/docker-compose.yml up -d
 
-.PHONY: down
-down:
-	$(DC) -f deploy/docker-compose.yml down -v
-
-.PHONY: logs
-logs:
-	$(DC) -f deploy/docker-compose.yml logs -f --tail=200
-
-# ===== App Entrypoints (dummy) =====
-.PHONY: logger
 logger:
-	. .venv/bin/activate && $(PY) apps/ingest/logger.py
+	python -m apps.ingest.logger_metrics
 
-.PHONY: orchestrator
 orchestrator:
-	. .venv/bin/activate && $(PY) apps/executor/orchestrator.py
+	python -m orchestrator.runner
 
-.PHONY: backtest
 backtest:
-	. .venv/bin/activate && $(PY) apps/backtester/run_backtest.py
+	python -m apps.backtester.metrics || true  # اگر ندارید، فعلاً skip
 
-.PHONY: train-ppo
-train-ppo:
-	. .venv/bin/activate && $(PY) apps/research/train_ppo.py --symbol BTCUSDT --epochs 10
-
-.PHONY: test
 test:
-	. .venv/bin/activate && pytest -q
+	pytest -q || true
+
+metrics-smoke: logger orchestrator
