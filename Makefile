@@ -58,3 +58,8 @@ train-ppo:
 .PHONY: test
 test:
 	. .venv/bin/activate && pytest -q
+
+# ===== Metrics =====
+.PHONY: metrics-smoke
+metrics-smoke:
+	. .venv/bin/activate && METRICS_MODE=log $(PY) libs/metrics.py
