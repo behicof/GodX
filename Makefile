@@ -41,15 +41,18 @@ logs:
 # ===== App Entrypoints (dummy) =====
 .PHONY: logger
 logger:
-	. .venv/bin/activate && $(PY) apps/ingest/logger.py
+	. .venv/bin/activate && $(PY) -m apps.ingest.logger_metrics
 
 .PHONY: orchestrator
 orchestrator:
-	. .venv/bin/activate && $(PY) apps/executor/orchestrator.py
+	. .venv/bin/activate && $(PY) -m orchestrator.metrics_hook
 
 .PHONY: backtest
 backtest:
-	. .venv/bin/activate && $(PY) apps/backtester/run_backtest.py
+	. .venv/bin/activate && $(PY) -m apps.backtester.metrics
+
+.PHONY: metrics-smoke
+metrics-smoke: logger orchestrator backtest
 
 .PHONY: train-ppo
 train-ppo:
