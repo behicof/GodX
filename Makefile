@@ -57,4 +57,27 @@ train-ppo:
 
 .PHONY: test
 test:
-	. .venv/bin/activate && pytest -q
+        . .venv/bin/activate && pytest -q
+
+# ===== Supply chain =====
+.PHONY: shas vendor verify-vendor sbom license-scan smoke
+
+shas:
+        ./scripts/fetch_shas.sh
+
+vendor:
+        ./scripts/clone_and_pin.sh repos.lock
+
+verify-vendor:
+        . .venv/bin/activate && $(PY) scripts/verify_vendor.py repos.lock vendor
+
+sbom:
+        @command -v cdxgen >/dev/null || (echo "cdxgen not installed" && exit 1)
+        cdxgen -r . -o sbom.json
+
+license-scan:
+        @command -v pip-licenses >/dev/null || (echo "pip-licenses not installed" && exit 1)
+        pip-licenses --format=json --output-file=licenses.json
+
+smoke:
+        . .venv/bin/activate && $(PY) scripts/smoke.py
