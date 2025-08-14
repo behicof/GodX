@@ -22,6 +22,14 @@ curl -s http://localhost:9090/-/healthy
 curl -s http://localhost:3000/login
 ```
 
+### Metrics configuration
+
+Metrics behaviour is driven by a few environment variables:
+
+- `METRICS_MODE` – one of `auto`, `push`, `export` or `log` (defaults to `auto`).
+- `PUSHGW_URL` – URL of a Prometheus Pushgateway for `push` mode.
+- `METRICS_PORT` – port for the HTTP exporter when using `export` mode (defaults to `8000`).
+
 ## Getting Started
 
 ```bash
