@@ -17,3 +17,9 @@ curl -s http://localhost:3000/login
 ```
 
 - Logs are JSON formatted via structlog and can be scraped by Prometheus.
+
+## Vendor Repositories
+
+- `OFFLINE=1 make vendor` to populate vendor/ using a local mirror.
+- `make vendor-clean && make vendor` for a fresh clone.
+- Update flow: `make shas` then open a PR with the updated `repos.lock`.

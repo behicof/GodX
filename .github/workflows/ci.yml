@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11"]
+    env:
+      OFFLINE: 1
+      TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+      - name: Cache vendor
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: vendor-${{ hashFiles('repos.lock') }}
+      - name: Update SHAs
+        if: env.TOKEN != ''
+        run: make shas
+      - name: Prepare vendor
+        run: make vendor
+      - name: Verify vendor
+        run: make verify-vendor
+      - name: Install test dependencies
+        run: pip install -r requirements.txt || true
+      - name: Run tests
+        run: pytest -q
