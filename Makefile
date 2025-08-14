@@ -3,11 +3,12 @@ PY := python3
 PIP := pip
 DC := docker compose
 APP := omni-arb
+PORT ?= 8000
 
 # ===== Default =====
 .PHONY: help
 help:
-	@echo "Targets: setup | up | down | logs | logger | orchestrator | backtest | train-ppo | test"
+        @echo "Targets: setup | up | down | logs | logger | orchestrator | backtest | train-ppo | metrics-smoke | test"
 
 # ===== Setup (py + docker) =====
 .PHONY: setup
@@ -53,7 +54,11 @@ backtest:
 
 .PHONY: train-ppo
 train-ppo:
-	. .venv/bin/activate && $(PY) apps/research/train_ppo.py --symbol BTCUSDT --epochs 10
+        . .venv/bin/activate && $(PY) apps/research/train_ppo.py --symbol BTCUSDT --epochs 10
+
+.PHONY: metrics-smoke
+metrics-smoke:
+        . .venv/bin/activate && $(PY) scripts/metrics_smoke.py --port $(PORT)
 
 .PHONY: test
 test:

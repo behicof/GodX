@@ -27,3 +27,14 @@ curl -s http://localhost:3000/login
 ```bash
 make test
 ```
+
+## Metrics Smoke Test
+
+Run a tiny exporter that emits dummy Prometheus metrics:
+
+```bash
+make metrics-smoke PORT=8000
+curl -s http://localhost:8000/metrics
+```
+
+The `PORT` variable is optional and defaults to `8000`.
